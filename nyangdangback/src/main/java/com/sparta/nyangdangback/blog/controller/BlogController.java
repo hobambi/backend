@@ -6,10 +6,9 @@ import com.sparta.nyangdangback.blog.service.BlogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +20,30 @@ public class BlogController {
     //게시글 작성
     @PostMapping
     public ResponseEntity<BlogResponseDto> createBlog(@RequestBody BlogRequestDto requestDto){
-        System.out.println("BlogController.createBlog");
         return blogService.createBlog(requestDto);
     }
+
+    //게시글 전체 조회
+    @GetMapping
+    public ResponseEntity<List<BlogResponseDto>> getBlogs() {
+        return blogService.getBlogs();
+    }
+
+    //선택한 게시글 상세 조회
+    @GetMapping("/{blogno}")
+    public ResponseEntity<BlogResponseDto> getBlog(@PathVariable Long blogno) {
+        return blogService.getBlog(blogno);
+    }
+
+    //선택한 게시글 수정
+    @PatchMapping("/{blogno}")
+    public ResponseEntity<BlogResponseDto> updateBlog(@PathVariable Long blogno,@RequestBody BlogRequestDto requestDto) {
+        return blogService.updateBlog(blogno,requestDto);
+    }
+
+    @DeleteMapping("/{blogno}")
+    public ResponseEntity<BlogResponseDto> deleteBlog(@PathVariable Long blogno) {
+        return blogService.deleteBlog(blogno);
+    }
+
 }
