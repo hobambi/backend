@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -19,7 +20,7 @@ public class BlogResponseDto {
     public BlogResponseDto(Blog blog) {
         this.id = blog.getId();
         this.title = blog.getTitle();
-        this.contents = blog.getContent();
+        this.contents = blog.getContents();
         this.createAt = blog.getCreateAt();
     }
 
@@ -28,7 +29,6 @@ public class BlogResponseDto {
                 .blog(blog)
                 .build();
     }
-
 
 }
 

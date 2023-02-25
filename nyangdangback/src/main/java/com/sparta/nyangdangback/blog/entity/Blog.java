@@ -18,12 +18,24 @@ public class Blog extends TimeStamped{
     private String title;
 
     @Column(nullable = false)
-    private String content;
+    private String contents;
+
+    ///////////////////////////
+//    private String originalImageName;
+//    private String storedImageName;
+//    private long fileSize;
+
+
+
+    //////////////////////////
 
     public Blog(BlogRequestDto blogRequestDto) {
         this.title = blogRequestDto.getTitle();
-        this.content = blogRequestDto.getContents();
+        this.contents = blogRequestDto.getContents();
     }
 
 
+    public void update(BlogRequestDto blogRequestDto) {
+        this.contents = blogRequestDto.getContents();
+    }
 }
