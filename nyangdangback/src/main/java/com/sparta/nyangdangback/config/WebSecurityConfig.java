@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -43,8 +44,8 @@ public class WebSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         //http.authorizeRequests().anyRequest().authenticated();
         http.authorizeRequests().antMatchers("/api/user/**").permitAll()
-                .antMatchers("/api/blog").permitAll()
-                .antMatchers("/api/reply").permitAll()
+                .antMatchers(HttpMethod.GET,"/api/blogs/**").permitAll()
+                //.antMatchers("/api/reply").permitAll()
                 .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); //    private final JwtUtil jwtUtil; 추가하기!
@@ -52,7 +53,7 @@ public class WebSecurityConfig {
         // 로그인 사용
         http.formLogin().permitAll();// 로그인 페이지가 있을 경우 넣기!.loginPage(".api/user/login-page").permitAll();
         // 로그인 실패
-        http.exceptionHandling().accessDeniedPage("/api/user/forbidden");
+        http.exceptionHandling().accessDeniedPage("/api/user/login");
         return http.build();
     }
 
