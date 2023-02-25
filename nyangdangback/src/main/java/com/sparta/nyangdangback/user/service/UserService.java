@@ -1,8 +1,8 @@
 package com.sparta.nyangdangback.user.service;
 
+import com.sparta.nyangdangback.dto.MessageDto;
 import com.sparta.nyangdangback.jwt.JwtUtil;
 import com.sparta.nyangdangback.user.dto.LoginRequestDto;
-import com.sparta.nyangdangback.dto.MessageDto;
 import com.sparta.nyangdangback.user.dto.SignupRequestDto;
 import com.sparta.nyangdangback.user.entity.User;
 import com.sparta.nyangdangback.user.entity.UserRoleEnum;
@@ -104,30 +104,35 @@ public class UserService {
     public ResponseEntity<?> signup(SignupRequestDto signupRequestDto, BindingResult bindingResult) {
         // username 규칙!
         String username = signupRequestDto.getUsername();
-//        if (username.length() < 4 || username.length() > 10) {
+        if (username.length() < 4 || username.length() > 10) {
+            throw  new IllegalArgumentException("아이디가 일치하지 않습니다.");
 //            return new ResponseEntity(NOT_CONGITION_USERNAME.getHttpStatus());
-//        }
-//        if (!username.matches("^[0-9|a-z]*$")) {
+        }
+        if (!username.matches("^[0-9|a-z]*$")) {
+            throw  new IllegalArgumentException("아이디가 일치하지 않습니다.");
 //            return new ResponseEntity(NOT_CONGITION_USERNAME.getHttpStatus());
-//        }
+        }
         String password = signupRequestDto.getPassword();
-//        System.out.println(password);
-//        if (password.length() < 8 || password.length() > 15) {
+        System.out.println(password);
+        if (password.length() < 4 || password.length() > 11) {
+            throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
 //            return new ResponseEntity(NOT_CONGITION_PASSWORD.getHttpStatus());
-//        }
-//        if (!password.matches("^[0-9|a-z|A-Z]*$")) {
+        }
+        if (!password.matches("^[0-9|a-z|A-Z]*$")) {
+            throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
 //            return new ResponseEntity(NOT_CONGITION_PASSWORD.getHttpStatus());
-//        }
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        if (bindingResult.hasErrors()){
-//            return ResponseEntity.badRequest()  // status : bad request
+        }
+//        if (bindingResult.hasErrors()) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (bindingResult.hasErrors()){
+            return ResponseEntity.ok(new MessageDto("회원가입 성공"));
+//                    .badRequest()  // status : bad request
 //                    .body(MessageDto.builder()  // body : SuccessResponseDto (statusCode, msg)
 //                            .statusCode(HttpStatus.BAD_REQUEST.value())
 //                            .msg(bindingResult.getAllErrors().get(0).getDefaultMessage())
 //                            .build());
-//        }
         }
+
         // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
@@ -158,6 +163,41 @@ public class UserService {
         userRepository.save(user);
         return ResponseEntity.ok(new MessageDto("회원가입 성공"));
     }
+    // 회원 가입
+//    @Transactional
+//    public String signup(SignupRequestDto signupRequestDto) {
+//        String username = signupRequestDto.getUsername();
+//        System.out.println(username);
+//        if (username.length() < 4 || username.length() > 11) {
+//            throw new IllegalArgumentException("아이디를 조건에 맞게 입력해주세요.");
+//        }
+//        if (!username.matches("^[0-9|a-z]*$")) {
+//            throw new IllegalArgumentException("아이디를 조건에 맞게 입력해주세요.");
+//        }
+//        String password = signupRequestDto.getPassword();
+//        System.out.println(password);
+//        if (password.length() < 4 || password.length() > 11) {
+//            throw new IllegalArgumentException("비밀번호를 조건에 맞게 입력해주세요.");
+//        }
+//        if (!password.matches("^[0-9|a-z|A-Z]*$")){
+//            throw new IllegalArgumentException("비밀번호를 조건에 맞게 입력해주세요.");
+//        }
+//        Optional<User> found = userRepository.findByUsername(username);
+//        if (found.isPresent()){
+//            throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
+//        }
+//        UserRoleEnum role = UserRoleEnum.USER;
+//        if (signupRequestDto.isAdmin()){
+//            if (signupRequestDto.getAdminToken().equals(ADMIN_TOKEN)){
+//                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
+//            }
+//            role = UserRoleEnum.ADMIN;
+//        }
+//        User user =new User(username, password, role);
+//        userRepository.save(user);
+//        return username;
+//    }
+
     @Transactional(readOnly = true)
     public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String username = loginRequestDto.getUsername();
