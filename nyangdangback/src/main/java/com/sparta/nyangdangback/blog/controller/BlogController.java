@@ -5,12 +5,14 @@ import com.sparta.nyangdangback.blog.dto.BlogResponseDto;
 import com.sparta.nyangdangback.blog.service.BlogService;
 import com.sparta.nyangdangback.config.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -21,9 +23,15 @@ public class BlogController {
     private final BlogService blogService;
 
     //게시글 작성
-    @PostMapping
-    public ResponseEntity<BlogResponseDto> createBlog( @RequestBody BlogRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return blogService.createBlog(requestDto,userDetails.getUser());
+//    @PostMapping
+//    public ResponseEntity<BlogResponseDto> createBlog( @RequestBody BlogRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        return blogService.createBlog(requestDto,userDetails.getUser());
+//    }
+//
+    @ResponseBody
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BlogResponseDto> createBlog(@RequestParam(value = "image") MultipartFile image, BlogRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails)throws IOException {
+        return blogService.createBlog(image,requestDto,userDetails.getUser());
     }
 
     //게시글 전체 조회

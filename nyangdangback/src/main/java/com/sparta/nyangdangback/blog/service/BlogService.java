@@ -5,6 +5,7 @@ import com.sparta.nyangdangback.blog.dto.BlogResponseDto;
 import com.sparta.nyangdangback.blog.entity.Blog;
 import com.sparta.nyangdangback.blog.repository.BlogRepository;
 import com.sparta.nyangdangback.dto.MessageDto;
+import com.sparta.nyangdangback.imagetemp.S3Uploader;
 import com.sparta.nyangdangback.util.CustomException;
 import com.sparta.nyangdangback.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,10 @@ import org.apache.logging.log4j.message.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +28,14 @@ import static com.sparta.nyangdangback.util.ErrorCode.*;
 public class BlogService {
 
     private final BlogRepository blogRepository;
+    private final S3Uploader s3Uploader;
+
 
     //게시글 작성
     @Transactional
-    public ResponseEntity<BlogResponseDto> createBlog(BlogRequestDto blogRequestDto, User user) {
-        Blog blog = blogRepository.saveAndFlush(new Blog(blogRequestDto, user));
+    public ResponseEntity<BlogResponseDto> createBlog(MultipartFile image,BlogRequestDto blogRequestDto, User user) throws IOException {
+        String storedFileName = s3Uploader.upload(image,"images"); //s3에 업로드하기
+        Blog blog = blogRepository.saveAndFlush(new Blog(storedFileName,blogRequestDto, user));
         return ResponseEntity.ok().body(BlogResponseDto.of(blog));
     }
 
