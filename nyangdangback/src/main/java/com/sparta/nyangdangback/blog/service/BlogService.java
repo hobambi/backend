@@ -5,7 +5,7 @@ import com.sparta.nyangdangback.blog.dto.BlogResponseDto;
 import com.sparta.nyangdangback.blog.entity.Blog;
 import com.sparta.nyangdangback.blog.repository.BlogRepository;
 import com.sparta.nyangdangback.dto.MessageDto;
-import com.sparta.nyangdangback.exception.CustomException;
+import com.sparta.nyangdangback.util.CustomException;
 import com.sparta.nyangdangback.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.message.Message;
@@ -16,9 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sparta.nyangdangback.exception.ErrorCode.FORBIDDEN_DATA;
-import static com.sparta.nyangdangback.exception.ErrorCode.NOT_FOUND_DATA;
-import static com.sparta.nyangdangback.user.entity.UserRoleEnum.USER;
+import static com.sparta.nyangdangback.util.ErrorCode.*;
+
 
 @Service
 @RequiredArgsConstructor

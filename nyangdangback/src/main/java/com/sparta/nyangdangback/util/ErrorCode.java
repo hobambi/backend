@@ -4,22 +4,42 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import static org.springframework.http.HttpStatus.*;
+
+
 @Getter
 @AllArgsConstructor
-// ResponseStatusException 과 비슷해 보이지만, 개발자가 한번에 관리,재사용 할 수 있게 정리.
 public enum ErrorCode {
-    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다."),
-    AUTHORIZATION(HttpStatus.BAD_REQUEST, "작성자만 수정/삭제할 수 있습니다."),
-    DUPLICATED_USERNAME(HttpStatus.BAD_REQUEST, "중복된 username 입니다"),
-    NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "회원을 찾을 수 없습니다."),
-    NOT_FOUND_BLOG(HttpStatus.BAD_REQUEST, "게시글을 찾을 수 없습니다."),
-    NOT_FOUND_COMMENT(HttpStatus.BAD_REQUEST, "댓글을 찾을 수 없습니다."),
-    DUPLICATE_USER(HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
-    NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
-    NOT_MATCH_USERNAME(HttpStatus.BAD_REQUEST, "닉네임이 일치하지 않습니다."),
-    INVALID_ADMIN_TOKEN(HttpStatus.BAD_REQUEST, "유효한 ADMIN_TOKEN 이 아닙니다."),
-    NOT_FOUND_TOKEN (HttpStatus.BAD_REQUEST, "토큰을 찾을 수 없습니다.");
+    /* 400 BAD_REQUEST : 잘못된 요청 */
+    INVALID_TOKEN(BAD_REQUEST, "토큰이 유효하지 않습니다"),
+    MISMATCH_TOKEN(BAD_REQUEST, "토큰의 유저 정보가 일치하지 않습니다"),
+    INVALIDATION_SIGNUP(BAD_REQUEST, "username과 password의 형식을 지켜주세요."),
+    INVALIDATION_PASSWORD(BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+
+
+    /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
+    INVALID_AUTH_TOKEN(UNAUTHORIZED, "권한 정보가 없는 토큰입니다"),
+    UNAUTHORIZED_MEMBER(UNAUTHORIZED, "현재 내 계정 정보가 존재하지 않습니다"),
+
+
+    /* 403 NOT_FOUND : Resource 를 찾을 수 없음 */
+    FORBIDDEN_DATA(FORBIDDEN, "권한이 없습니다."),
+
+
+    /* 404 NOT_FOUND : Resource 를 찾을 수 없음 */
+    MEMBER_NOT_FOUND(NOT_FOUND, "해당 유저 정보를 찾을 수 없습니다"),
+    EMPTY_CLIENT(NOT_FOUND, "등록된 유저가 없습니다."),
+    NOT_FOUND_CLIENT(NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
+    NOT_FOUND_DATA(NOT_FOUND,"해당 게시물을 찾을 수 없습니다."),
+    NOT_FOUND_COMMENT(NOT_FOUND,"해당 댓글을 찾을 수 없습니다."),
+
+
+    /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
+    DUPLICATE_RESOURCE(CONFLICT, "데이터가 이미 존재합니다"),
+    DUPLICATE_MEMBER(CONFLICT, "중복된 사용자가 존재합니다"),
+
+    ;
 
     private final HttpStatus httpStatus;
-    private final String msg;
+    private final String detail;
 }
