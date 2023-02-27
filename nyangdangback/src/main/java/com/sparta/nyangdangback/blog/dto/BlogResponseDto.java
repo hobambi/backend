@@ -15,7 +15,9 @@ public class BlogResponseDto {
     private String username;
     private String title;
     private String contents;
+    private String imageUrl;
     private LocalDateTime createAt;
+
 
 
     @Builder
@@ -25,6 +27,7 @@ public class BlogResponseDto {
         this.contents = blog.getContents();
         this.createAt = blog.getCreateAt();
         this.username = blog.getUser().getUsername();
+        this.imageUrl=blog.getImageUrl();
     }
 
     public static BlogResponseDto of(Blog blog) {

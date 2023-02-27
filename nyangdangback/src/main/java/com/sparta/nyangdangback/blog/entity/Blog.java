@@ -28,10 +28,11 @@ public class Blog extends TimeStamped{
     private User user;
 
 
-    public Blog(BlogRequestDto blogRequestDto, User user) {
+    public Blog(String imageUrl, BlogRequestDto blogRequestDto, User user) {
         this.title = blogRequestDto.getTitle();
         this.contents = blogRequestDto.getContents();
         this.user = user;
+        this.imageUrl = imageUrl;
     }
 
 
