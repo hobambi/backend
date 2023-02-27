@@ -12,9 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 public class BlogResponseDto {
     private Long id;
+    private String username;
     private String title;
     private String contents;
     private LocalDateTime createAt;
+
 
     @Builder
     public BlogResponseDto(Blog blog) {
@@ -22,6 +24,7 @@ public class BlogResponseDto {
         this.title = blog.getTitle();
         this.contents = blog.getContents();
         this.createAt = blog.getCreateAt();
+        this.username = blog.getUser().getUsername();
     }
 
     public static BlogResponseDto of(Blog blog) {
