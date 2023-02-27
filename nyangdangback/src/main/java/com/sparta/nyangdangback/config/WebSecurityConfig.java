@@ -60,7 +60,7 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); //    private final JwtUtil jwtUtil; 추가하기!
-
+        http.cors();
         // 로그인 사용
         http.formLogin().permitAll();// 로그인 페이지가 있을 경우 넣기!.loginPage(".api/user/login-page").permitAll();
         // 로그인 실패
@@ -168,3 +168,5 @@ public class WebSecurityConfig {
     - 쿠키 기반의 취약점을 이용한 공격 이기 때문에 REST 방식의 API에서는 disable 가능
     - POST 요청마다 처리해 주는 대신 **CSRF protection 을 disable**
  */
+
+
