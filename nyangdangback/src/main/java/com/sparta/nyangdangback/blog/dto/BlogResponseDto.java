@@ -6,21 +6,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public class BlogResponseDto {
     private Long id;
+    private String username;
     private String title;
     private String contents;
     private LocalDateTime createAt;
+
 
     @Builder
     public BlogResponseDto(Blog blog) {
         this.id = blog.getId();
         this.title = blog.getTitle();
-        this.contents = blog.getContent();
+        this.contents = blog.getContents();
         this.createAt = blog.getCreateAt();
+        this.username = blog.getUser().getUsername();
     }
 
     public static BlogResponseDto of(Blog blog) {
@@ -28,7 +32,6 @@ public class BlogResponseDto {
                 .blog(blog)
                 .build();
     }
-
 
 }
 

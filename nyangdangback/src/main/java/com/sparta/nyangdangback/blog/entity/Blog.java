@@ -1,6 +1,7 @@
 package com.sparta.nyangdangback.blog.entity;
 
 import com.sparta.nyangdangback.blog.dto.BlogRequestDto;
+import com.sparta.nyangdangback.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,12 +19,23 @@ public class Blog extends TimeStamped{
     private String title;
 
     @Column(nullable = false)
-    private String content;
+    private String contents;
 
-    public Blog(BlogRequestDto blogRequestDto) {
+    private String imageUrl;
+
+    @ManyToOne
+    @JoinColumn(name="user_no")
+    private User user;
+
+
+    public Blog(BlogRequestDto blogRequestDto, User user) {
         this.title = blogRequestDto.getTitle();
-        this.content = blogRequestDto.getContents();
+        this.contents = blogRequestDto.getContents();
+        this.user = user;
     }
 
 
+    public void update(BlogRequestDto blogRequestDto) {
+        this.contents = blogRequestDto.getContents();
+    }
 }
