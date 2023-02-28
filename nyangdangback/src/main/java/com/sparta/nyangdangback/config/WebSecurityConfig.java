@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.nyangdangback.jwt.JwtAuthFilter;
 import com.sparta.nyangdangback.jwt.JwtUtil;
 import com.sparta.nyangdangback.user.repository.UserRepository;
+import com.sparta.nyangdangback.util.GlobalExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -17,15 +18,24 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -44,7 +54,7 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         // h2-console 사용 및 resources 접근 허용 설정
         return (web) -> web.ignoring()
-                .requestMatchers(PathRequest.toH2Console())
+                //.requestMatchers(PathRequest.toH2Console())
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
     @Bean
@@ -56,7 +66,8 @@ public class WebSecurityConfig {
         //http.authorizeRequests().anyRequest().authenticated();
         http.authorizeRequests().antMatchers("/api/user/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/blogs/**").permitAll()
-                //.antMatchers("/api/reply").permitAll()
+//                .antMatchers(HttpMethod.POST, "/api/logout").permitAll()
+                .antMatchers("/api/reply/**").permitAll()
                 .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); //    private final JwtUtil jwtUtil; 추가하기!
@@ -65,8 +76,31 @@ public class WebSecurityConfig {
         http.formLogin().permitAll();// 로그인 페이지가 있을 경우 넣기!.loginPage(".api/user/login-page").permitAll();
         // 로그인 실패
         http.exceptionHandling().accessDeniedPage("/api/user/login");
+
+        http.logout()//.permitAll() // 로그아웃 기능 작동함
+                .logoutUrl("Logout") // 로그아웃 처리 URL, default: /logout, 원칙적으로 post 방식만 지원
+                .logoutSuccessUrl("/api/user/login") // 로그아웃 성공 후 이동페이지
+                .deleteCookies("JSESSIONID", "remember-me");
+
         return http.build();
     }
+//    protected void cofigure(HttpSecurity http) throws Exception {
+//        // 로그아웃
+//        http.logout()//.permitAll() // 로그아웃 기능 작동함
+//                .logoutUrl("Logout") // 로그아웃 처리 URL, default: /logout, 원칙적으로 post 방식만 지원
+//                .logoutSuccessUrl("/api/user/login") // 로그아웃 성공 후 이동페이지
+//                .deleteCookies("JSESSIONID", "remember-me"); // 로그아웃 후 쿠키 삭제
+////                .addLogoutHandler(logoutHandler()) // 로그아웃 핸들러 익명의 객체 넣기
+////                .logoutSuccessHandler(logoutSuccessHandler()); // 로그아웃 성공 후 핸들러
+//    }
+
+//    private LogoutHandler logoutHandler() {
+//    }
+//
+//    private LogoutSuccessHandler logoutSuccessHandler() {
+//        return null;
+//    }
+
     // 이 설정을 해주면, 우리가 설정한대로 CorsFilter가 Security의 filter에 추가되어
     // 예비 요청에 대한 처리를 해주게 됩니다.
     // CorsFilter의 동작 과정이 궁금하시면, CorsFilter의 소스코드를 들어가 보세요!
@@ -103,6 +137,7 @@ public class WebSecurityConfig {
 
         return source;
     }
+
 //    @Bean
 //    public JwtAuthFilter jwtAuthFilter() {
 //
@@ -149,18 +184,17 @@ public class WebSecurityConfig {
 //        return new JwtAuthFilter(jwtUtil);
 //    }
 //
-//
 //    @Bean
 //    public PasswordEncoder passwordEncoder() {
 //        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 //    }
-//
+
 //    @Bean
 //    public UserDetailsService userDetailsService(){
 //        return new UserDetailsServiceImpl(userRepository);
 //    }
-//}
 }
+
 /*
 - **CSRF(사이트 간 요청 위조, Cross-site request forgery)**
     - 공격자가 인증된 브라우저에 저장된 쿠키의 세션 정보를 활용하여 웹 서버에 사용자가 의도하지 않은 요청을 전달하는 것

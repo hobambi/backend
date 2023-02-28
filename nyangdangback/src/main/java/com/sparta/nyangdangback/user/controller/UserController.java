@@ -8,15 +8,22 @@ import com.sparta.nyangdangback.user.dto.SignupRequestDto;
 import com.sparta.nyangdangback.user.service.KakaoService;
 import com.sparta.nyangdangback.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
@@ -65,5 +72,33 @@ public class UserController {
         cookie.setPath("/");
         response.addCookie(cookie);
         return "redirect:/api/index";
+    }
+    // 아이디 중복확인
+    //@GetMapping("/{username}/exists")
+    @RequestMapping(value = "/{username}/exists", method = {RequestMethod.GET,RequestMethod.POST})
+    //@PostMapping("/{username}/exists")
+    public ResponseEntity<Boolean> checkUsernamerDuplicate(@PathVariable String username) {
+        return ResponseEntity.ok(userService.checkUsernamerDuplicate(username));
+    }
+    //로그아웃 처리
+//    public ModelAndView logout(HttpSession session) {
+//        userService.logout(session);
+//        ModelAndView mav = new ModelAndView();
+//        mav.setViewName("username/login");
+//        mav.addObject("msg", "logout");
+//        return mav;
+//    }
+    @RequestMapping(value = "/logout", method = {RequestMethod.GET,RequestMethod.POST})
+    //@PostMapping("/logout")
+    //@GetMapping("/logout")
+    //@PutMapping("/logout")
+    //@PatchMapping("/logout")
+    public String logoutPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        new SecurityContextHolder().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/api/user/login";
     }
 }
