@@ -10,12 +10,19 @@ import com.sparta.nyangdangback.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 @Service
@@ -24,8 +31,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;  //시큐리티
-
     private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
+
 
 //    @Transactional
 //    public void signup(SignupRequestDto signupRequestDto){
@@ -214,5 +221,21 @@ public class UserService {
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
     }
+
+    @Transactional
+    public boolean checkUsernamerDuplicate(String username) {
+        return userRepository.existsByusername(username);
+    }
+
+//    public void logout() {
+//    }
+
+    @Transactional
+    public void logout(HttpSession session) {
+        session.invalidate();
+        //return ; // 리턴 값 생각해보기!!!
+    }
+
+
 }
 

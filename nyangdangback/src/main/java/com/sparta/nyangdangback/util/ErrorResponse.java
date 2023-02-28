@@ -15,7 +15,7 @@ public class ErrorResponse {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(ErrorResponse.builder()
-                        .msg(errorCode.getMsg())
+                        .msg(errorCode.getDetail())
                         .statusCode(errorCode.getHttpStatus().value())
                         .build());
     }
