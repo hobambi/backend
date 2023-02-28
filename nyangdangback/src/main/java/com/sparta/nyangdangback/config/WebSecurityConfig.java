@@ -202,5 +202,3 @@ public class WebSecurityConfig {
     - 쿠키 기반의 취약점을 이용한 공격 이기 때문에 REST 방식의 API에서는 disable 가능
     - POST 요청마다 처리해 주는 대신 **CSRF protection 을 disable**
  */
-
-
