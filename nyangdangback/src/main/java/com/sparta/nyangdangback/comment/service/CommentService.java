@@ -13,6 +13,7 @@ import com.sparta.nyangdangback.user.entity.User;
 import com.sparta.nyangdangback.user.entity.UserRoleEnum;
 import com.sparta.nyangdangback.user.repository.UserRepository;
 import com.sparta.nyangdangback.util.CustomException;
+import com.sparta.nyangdangback.util.ErrorCode;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,16 +34,16 @@ public class CommentService {
     private final JwtUtil jwtUtil;
 
     // 댓글 작성
-    public ResponseEntity<CommentResponseDto> createComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        User findUser = isValidTokenAndUser(request);
+    public ResponseEntity<CommentResponseDto> createComment(Long id, CommentRequestDto commentRequestDto, User user) {
+//        User findUser = isValidTokenAndUser(request);
 
         Optional<Blog> findBlog = blogRepository.findById(id);
         if(findBlog.isEmpty()) {
-            throw new CustomException(ErrorCodeEnum.NOT_EXIST_RESOURCE);
+            throw new CustomException(ErrorCode.NOT_FOUND_DATA);
         }
         // 댓글 생성
         Comment comment = Comment.builder()
-                .user(findUser)
+                .user(user)
                 .blog(findBlog.get())
                 .comment(commentRequestDto.getComment())
                 .build();
@@ -53,64 +54,64 @@ public class CommentService {
                 .build());
     }
 
-    // 댓글 수정
-    public ResponseEntity<CommentResponseDto> updateComment(Long commentid, String commentCotent, HttpServletRequest request) {
-        User findUser = isValidTokenAndUser(request);
+//    // 댓글 수정
+//    public ResponseEntity<CommentResponseDto> updateComment(Long commentid, String commentCotent, HttpServletRequest request) {
+//        User findUser = isValidTokenAndUser(request);
+//
+//        Optional<Comment> findComment = commentRepository.findById(commentid);
+//        if(findComment.isEmpty()) {
+//            throw new CustomException(ErrorCodeEnum.NOT_EXIST_RESOURCE);
+//        }
+//        // 권한 user, 자신이 쓴 댓글이 아닌경우
+//        if (findUser.getRole()) == UserRoleEnum.USER && findComment.get().getUser() != findUser) {
+//            throw new CustomException(ErrorCodeEnum.INVALID_AUTH_MEMBER);
+//        }
+//        // 자동감지로 댓글 수정
+//        findComment.get().updateComment(commentCotent);
+//        return ResponseEntity.ok().body(
+//                CommentResponseDto.builder()
+//                        .comment(findComment.get())
+//                        .build()
+//        );
+//    }
+//
+//    // 댓글 삭제
+//    public ResponseEntity<StatusMsgResponseDto> deleteComment(Long id, HttpServletRequest request) {
+//        User findUser = isValidTokenAndUser(request);
+//        // 댓글 번호로 해당 댓글 DB에서 가져오기
+//        Optional<Comment> findComment = commentRepository.findById(id);
+//        if(findComment.isEmpty()) {
+//            throw new CustomException(ErrorCodeEnum.NOT_EXIST_RESOURCE);
+//        }
+//        // 권한 USER, 자신이 쓴 댓글이 아닌경우
+//        if (findUser.getRole()) ==UserRoleEnum.USER && findComment.get().getUser() != findUser) {
+//            throw new CustomException(ErrorCodeEnum.INVALID_AUTH_MEMBER);
+//        }
+//        // 해당 댓글 삭제
+//        commentRepository.delete(findComment.get());
+//        return ResponseEntity.ok(new StatusMsgResponseDto("댓글 삭제 완료!", HttpStatus.OK.value()));
+//    }
 
-        Optional<Comment> findComment = commentRepository.findById(commentid);
-        if(findComment.isEmpty()) {
-            throw new CustomException(ErrorCodeEnum.NOT_EXIST_RESOURCE);
-        }
-        // 권한 user, 자신이 쓴 댓글이 아닌경우
-        if (findUser.getRole()) == UserRoleEnum.USER && findComment.get().getUser() != findUser) {
-            throw new CustomException(ErrorCodeEnum.INVALID_AUTH_MEMBER);
-        }
-        // 자동감지로 댓글 수정
-        findComment.get().updateComment(commentCotent);
-        return ResponseEntity.ok().body(
-                CommentResponseDto.builder()
-                        .comment(findComment.get())
-                        .build()
-        );
-    }
-
-    // 댓글 삭제
-    public ResponseEntity<StatusMsgResponseDto> deleteComment(Long id, HttpServletRequest request) {
-        User findUser = isValidTokenAndUser(request);
-        // 댓글 번호로 해당 댓글 DB에서 가져오기
-        Optional<Comment> findComment = commentRepository.findById(id);
-        if(findComment.isEmpty()) {
-            throw new CustomException(ErrorCodeEnum.NOT_EXIST_RESOURCE);
-        }
-        // 권한 USER, 자신이 쓴 댓글이 아닌경우
-        if (findUser.getRole()) ==UserRoleEnum.USER && findComment.get().getUser() != findUser) {
-            throw new CustomException(ErrorCodeEnum.INVALID_AUTH_MEMBER);
-        }
-        // 해당 댓글 삭제
-        commentRepository.delete(findComment.get());
-        return ResponseEntity.ok(new StatusMsgResponseDto("댓글 삭제 완료!", HttpStatus.OK.value()));
-    }
-
-    // 토큰 유효성 확인 및 회원체크
-    private User isValidTokenAndUser(HttpServletRequest request) {
-        // 요청 Header로 전달되는 토큰 get
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
-        // token 있는지 없는지 확인
-        // Null이면 token 없음
-        if (token == null) {
-            throw new CustomException(ErrorCodeEnum.FOUND_NOT_TOKEN);
-        }
-        if (jwtUtil.validateToken(token)) {
-            claims = jwtUtil.getUserInfoFromToken(token); // 토큰에 있는 회원정보 가져오기
-        } else {
-            throw new CustomException(ErrorCodeEnum.INVALID_TOKEN);
-        }
-        //토큰에 생성시 사용한 회원명 얻어서 해당 회원이 있는지 DB에서 찾기
-        Optional<User> findUser = userRepository.findByUsername(claims.getSubject());
-        if (findUser.isEmpty()) {
-            throw new CustomException(ErrorCodeEnum.MEMBER_NOT_FOUND);
-        }
-        return findUser.get();
-    }
+//    // 토큰 유효성 확인 및 회원체크
+//    private User isValidTokenAndUser(HttpServletRequest request) {
+//        // 요청 Header로 전달되는 토큰 get
+//        String token = jwtUtil.resolveToken(request);
+//        Claims claims;
+//        // token 있는지 없는지 확인
+//        // Null이면 token 없음
+//        if (token == null) {
+//            throw new CustomException(ErrorCodeEnum.FOUND_NOT_TOKEN);
+//        }
+//        if (jwtUtil.validateToken(token)) {
+//            claims = jwtUtil.getUserInfoFromToken(token); // 토큰에 있는 회원정보 가져오기
+//        } else {
+//            throw new CustomException(ErrorCodeEnum.INVALID_TOKEN);
+//        }
+//        //토큰에 생성시 사용한 회원명 얻어서 해당 회원이 있는지 DB에서 찾기
+//        Optional<User> findUser = userRepository.findByUsername(claims.getSubject());
+//        if (findUser.isEmpty()) {
+//            throw new CustomException(ErrorCodeEnum.MEMBER_NOT_FOUND);
+//        }
+//        return findUser.get();
+//    }
 }
