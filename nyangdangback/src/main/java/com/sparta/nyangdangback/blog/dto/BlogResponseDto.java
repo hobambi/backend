@@ -1,6 +1,7 @@
 package com.sparta.nyangdangback.blog.dto;
 
 import com.sparta.nyangdangback.blog.entity.Blog;
+import com.sparta.nyangdangback.comment.dto.CommentResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,15 +22,19 @@ public class BlogResponseDto {
 
     private boolean heart;
 
+    private List<CommentResponseDto> comments;
+
     @Builder
-    public BlogResponseDto(Blog blog) {
+    public BlogResponseDto(Blog blog,List<CommentResponseDto> comments,boolean heart) {
         this.id = blog.getId();
         this.title = blog.getTitle();
         this.contents = blog.getContents();
         this.createAt = blog.getCreateAt();
         this.username = blog.getUser().getUsername();
         this.imageUrl=blog.getImageUrl();
+        this.comments = comments;
         this.likes = blog.getLikes();
+        this.heart = heart;
     }
 
     public static BlogResponseDto of(Blog blog) {

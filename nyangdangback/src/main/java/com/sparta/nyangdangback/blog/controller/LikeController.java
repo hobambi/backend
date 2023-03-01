@@ -1,9 +1,8 @@
-package com.sparta.nyangdangback.like.controller;
+package com.sparta.nyangdangback.blog.controller;
 
-import com.sparta.nyangdangback.BaseResponseDto;
 import com.sparta.nyangdangback.blog.dto.BlogResponseDto;
 import com.sparta.nyangdangback.config.UserDetailsImpl;
-import com.sparta.nyangdangback.like.service.LikeService;
+import com.sparta.nyangdangback.blog.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

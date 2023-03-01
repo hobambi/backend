@@ -1,7 +1,7 @@
 package com.sparta.nyangdangback.blog.entity;
 
 import com.sparta.nyangdangback.blog.dto.BlogRequestDto;
-import com.sparta.nyangdangback.like.entity.Like;
+import com.sparta.nyangdangback.comment.entity.Comment;
 import com.sparta.nyangdangback.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +34,9 @@ public class Blog extends TimeStamped{
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "blog")
     private List<Like> like = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "blog")
+    private List<Comment> comments = new ArrayList<>();
 
 
     public Blog(BlogRequestDto blogRequestDto, User user) {

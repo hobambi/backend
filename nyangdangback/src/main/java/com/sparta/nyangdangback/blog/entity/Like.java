@@ -1,4 +1,4 @@
-package com.sparta.nyangdangback.like.entity;
+package com.sparta.nyangdangback.blog.entity;
 
 import com.sparta.nyangdangback.blog.entity.Blog;
 import com.sparta.nyangdangback.user.entity.User;

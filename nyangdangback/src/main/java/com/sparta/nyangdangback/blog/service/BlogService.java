@@ -3,19 +3,19 @@ package com.sparta.nyangdangback.blog.service;
 import com.sparta.nyangdangback.blog.dto.BlogRequestDto;
 import com.sparta.nyangdangback.blog.dto.BlogResponseDto;
 import com.sparta.nyangdangback.blog.entity.Blog;
+import com.sparta.nyangdangback.blog.entity.Like;
 import com.sparta.nyangdangback.blog.repository.BlogRepository;
-import com.sparta.nyangdangback.dto.MessageDto;
+import com.sparta.nyangdangback.comment.dto.CommentResponseDto;
+import com.sparta.nyangdangback.comment.entity.Comment;
+import com.sparta.nyangdangback.comment.repository.CommentRepository;
 import com.sparta.nyangdangback.imagetemp.S3Uploader;
-import com.sparta.nyangdangback.like.entity.Like;
-import com.sparta.nyangdangback.like.repository.LikeRepository;
+import com.sparta.nyangdangback.blog.repository.LikeRepository;
 import com.sparta.nyangdangback.util.CustomException;
 import com.sparta.nyangdangback.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.message.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -32,6 +32,7 @@ public class BlogService {
     private final BlogRepository blogRepository;
     private final S3Uploader s3Uploader;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
 
     //게시글 작성
@@ -41,6 +42,7 @@ public class BlogService {
         System.out.println("blogRequestDto.getTitle = " + blogRequestDto.getTitle());
         System.out.println("blogRequestDto.contents = " + blogRequestDto.getContents());
         System.out.println("-------user = " + user.getUsername());
+
         String storedFileName = s3Uploader.upload(image, "images"); //s3에 업로드하기
         blogRequestDto.setImageUrl(storedFileName);
 
@@ -50,24 +52,28 @@ public class BlogService {
 
     //게시글 전체 조회
     @Transactional(readOnly = true)
-    public ResponseEntity<List<BlogResponseDto>> getBlogs() {
+    public ResponseEntity<List<BlogResponseDto>> getBlogs(User user) {
         List<Blog> blogList = blogRepository.findAllByOrderByModifiedAtDesc();
         List<BlogResponseDto> blogResponseDtoList = new ArrayList<>();
+
         for (Blog blog : blogList) {
-//            Like like = likeRepository.findByBlog_IdAndUser_Id(blog.getId(),)
-            blogResponseDtoList.add(new BlogResponseDto(blog));
+            boolean heart = isHeart(user, blog);
+            List<CommentResponseDto> commentRepositoryList = getComment(blog);
+            blogResponseDtoList.add(new BlogResponseDto(blog, commentRepositoryList, heart));
         }
         return ResponseEntity.ok().body(blogResponseDtoList);
     }
 
+
     //선택한 게시글 조회
     @Transactional(readOnly = true)
-    public ResponseEntity<BlogResponseDto> getBlog(Long blogno) {
+    public ResponseEntity<BlogResponseDto> getBlog(Long blogno, User user) {
         Blog blog = blogRepository.findById(blogno).orElseThrow(
                 () -> new CustomException(NOT_FOUND_DATA));
-//        Blog blog = blogRepository.findById(blogno).orElseThrow(
-//                () -> new IllegalArgumentException("없는 게시글 입니다."));
-        return ResponseEntity.ok().body(BlogResponseDto.of(blog));
+        List<CommentResponseDto> commentRepositoryList = getComment(blog);
+        boolean heart = isHeart(user, blog);
+        BlogResponseDto blogResponseDto = new BlogResponseDto(blog, commentRepositoryList, heart);
+        return ResponseEntity.ok().body(blogResponseDto);
     }
 
     //선택한 게시글 수정
@@ -103,9 +109,29 @@ public class BlogService {
         return ResponseEntity.ok().body("게시글 삭제 성공");
     }
 
-    @Transactional
-    public void likeBlog(Blog blog) {
+    //게시글에 있는 댓글 가져오기
+    private List<CommentResponseDto> getComment(Blog blog) {
+        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
+        List<Comment> commentList = commentRepository.findAllByBlogOrderByCreateAtDesc(blog);
+        for (Comment c : commentList) {
+            commentResponseDtoList.add(new CommentResponseDto(c));
+        }
+        return commentResponseDtoList;
+    }
+
+    //게시글 하트 가져오기
+    private boolean isHeart(User user, Blog blog) {
+        boolean heart = false;
+        Long likeCheck = likeRepository.countByBlog_IdAndUser_Id(blog.getId(), user.getId());
+        if (likeCheck != 0)
+            heart = true;
+        return heart;
+    }
+
+    //게시글 좋아요 누르기
+    public void likeBlog(Blog blog, boolean heart) {
         Long likeNo = blog.getLikes();
-        blog.like(likeNo+1);
+        if (heart) blog.like(likeNo + 1);
+        else blog.like(likeNo - 1);
     }
 }
