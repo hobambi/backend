@@ -1,6 +1,7 @@
 package com.sparta.nyangdangback.comment.entity;
 
 import com.sparta.nyangdangback.blog.entity.Blog;
+import com.sparta.nyangdangback.blog.entity.TimeStamped;
 import com.sparta.nyangdangback.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Comment extends Timestamped {
+public class Comment extends TimeStamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;

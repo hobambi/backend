@@ -33,8 +33,8 @@ public class CommentService {
     private final JwtUtil jwtUtil;
 
     // 댓글 작성
-    public ResponseEntity<CommentResponseDto> createComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        User findUser = isValidTokenAndUser(request);
+    public ResponseEntity<CommentResponseDto> createComment(Long id, CommentRequestDto commentRequestDto, User user) {
+//        User findUser = isValidTokenAndUser(request);
 
         Optional<Blog> findBlog = blogRepository.findById(id);
         if(findBlog.isEmpty()) {

@@ -5,8 +5,10 @@ import com.sparta.nyangdangback.comment.dto.CommentRequestDto;
 import com.sparta.nyangdangback.comment.dto.CommentResponseDto;
 import com.sparta.nyangdangback.comment.dto.StatusMsgResponseDto;
 import com.sparta.nyangdangback.comment.service.CommentService;
+import com.sparta.nyangdangback.config.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,20 +21,20 @@ public class CommentController {
     private final CommentService commentService;
 
     // 댓글 작성
-    @PostMapping("/api/blogs/{id}/comment")
-    public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        return commentService.createComment(id, commentRequestDto, request);
+    @PostMapping("/comment")
+    public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.createComment(id, commentRequestDto, userDetails.getUser());
     }
 
-    // 댓글 수정
-    @PutMapping("/api/blogs/{id}/comment")
-    public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        return commentService.updateComment(id, commentRequestDto.getComment(), request);
-    }
-
-    // 댓글 삭제
-    @DeleteMapping("/api/blogs/{id}/comment")
-    public ResponseEntity<StatusMsgResponseDto> deleteComment(@PathVariable Long id, HttpServletRequest request) {
-        return commentService.deleteComment(id, request);
-    }
+//    // 댓글 수정
+//    @PutMapping("/api/blogs/{id}/comment")
+//    public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return commentService.updateComment(id, commentRequestDto.getComment(), userDetails.getUser());
+//    }
+//
+//    // 댓글 삭제
+//    @DeleteMapping("/api/blogs/{id}/comment")
+//    public ResponseEntity<StatusMsgResponseDto> deleteComment(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return commentService.deleteComment(id, request);
+//    }
 }
