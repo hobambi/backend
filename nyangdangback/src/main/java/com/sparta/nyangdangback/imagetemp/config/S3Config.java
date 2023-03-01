@@ -13,7 +13,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 //@NoArgsConstructor
-@PropertySource("classpath:application-s3.properties")
+@PropertySource("classpath:application-s3.properties") //properties 인식하게 해주는거
 public class S3Config {
     @Value("${cloud.aws.credentials.accessKey}")
     private String accessKey;

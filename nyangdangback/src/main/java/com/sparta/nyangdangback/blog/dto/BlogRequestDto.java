@@ -9,6 +9,7 @@ import lombok.ToString;
 @Setter
 public class BlogRequestDto {
 
+    private String imageUrl;
     private String title;
     private String contents;
 
