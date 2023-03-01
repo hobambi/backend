@@ -17,8 +17,9 @@ public class BlogResponseDto {
     private String contents;
     private String imageUrl;
     private LocalDateTime createAt;
+    private Long likes;
 
-
+    private boolean heart;
 
     @Builder
     public BlogResponseDto(Blog blog) {
@@ -28,6 +29,7 @@ public class BlogResponseDto {
         this.createAt = blog.getCreateAt();
         this.username = blog.getUser().getUsername();
         this.imageUrl=blog.getImageUrl();
+        this.likes = blog.getLikes();
     }
 
     public static BlogResponseDto of(Blog blog) {

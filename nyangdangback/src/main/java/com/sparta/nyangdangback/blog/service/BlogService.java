@@ -6,6 +6,8 @@ import com.sparta.nyangdangback.blog.entity.Blog;
 import com.sparta.nyangdangback.blog.repository.BlogRepository;
 import com.sparta.nyangdangback.dto.MessageDto;
 import com.sparta.nyangdangback.imagetemp.S3Uploader;
+import com.sparta.nyangdangback.like.entity.Like;
+import com.sparta.nyangdangback.like.repository.LikeRepository;
 import com.sparta.nyangdangback.util.CustomException;
 import com.sparta.nyangdangback.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +31,20 @@ public class BlogService {
 
     private final BlogRepository blogRepository;
     private final S3Uploader s3Uploader;
+    private final LikeRepository likeRepository;
 
 
     //게시글 작성
     @Transactional
-    public ResponseEntity<BlogResponseDto> createBlog(MultipartFile image,BlogRequestDto blogRequestDto, User user) throws IOException {
-        String storedFileName = s3Uploader.upload(image,"images"); //s3에 업로드하기
-        Blog blog = blogRepository.saveAndFlush(new Blog(storedFileName,blogRequestDto, user));
+    public ResponseEntity<BlogResponseDto> createBlog(MultipartFile image, BlogRequestDto blogRequestDto, User user) throws IOException {
+        System.out.println("-------blogRequestDto = " + blogRequestDto);
+        System.out.println("blogRequestDto.getTitle = " + blogRequestDto.getTitle());
+        System.out.println("blogRequestDto.contents = " + blogRequestDto.getContents());
+        System.out.println("-------user = " + user.getUsername());
+        String storedFileName = s3Uploader.upload(image, "images"); //s3에 업로드하기
+        blogRequestDto.setImageUrl(storedFileName);
+
+        Blog blog = blogRepository.saveAndFlush(new Blog(blogRequestDto, user));
         return ResponseEntity.ok().body(BlogResponseDto.of(blog));
     }
 
@@ -45,6 +54,7 @@ public class BlogService {
         List<Blog> blogList = blogRepository.findAllByOrderByModifiedAtDesc();
         List<BlogResponseDto> blogResponseDtoList = new ArrayList<>();
         for (Blog blog : blogList) {
+//            Like like = likeRepository.findByBlog_IdAndUser_Id(blog.getId(),)
             blogResponseDtoList.add(new BlogResponseDto(blog));
         }
         return ResponseEntity.ok().body(blogResponseDtoList);
@@ -54,7 +64,7 @@ public class BlogService {
     @Transactional(readOnly = true)
     public ResponseEntity<BlogResponseDto> getBlog(Long blogno) {
         Blog blog = blogRepository.findById(blogno).orElseThrow(
-                ()-> new CustomException(NOT_FOUND_DATA));
+                () -> new CustomException(NOT_FOUND_DATA));
 //        Blog blog = blogRepository.findById(blogno).orElseThrow(
 //                () -> new IllegalArgumentException("없는 게시글 입니다."));
         return ResponseEntity.ok().body(BlogResponseDto.of(blog));
@@ -90,7 +100,12 @@ public class BlogService {
 //        }else {
 //            blogRepository.deleteById(blogno);
 //        }
-
         return ResponseEntity.ok().body("게시글 삭제 성공");
+    }
+
+    @Transactional
+    public void likeBlog(Blog blog) {
+        Long likeNo = blog.getLikes();
+        blog.like(likeNo+1);
     }
 }
