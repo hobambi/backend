@@ -1,5 +1,6 @@
 package com.sparta.nyangdangback.comment.repository;
 
+import com.sparta.nyangdangback.blog.entity.Blog;
 import com.sparta.nyangdangback.comment.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 

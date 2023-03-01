@@ -1,5 +1,7 @@
 package com.sparta.nyangdangback.comment.entity;
 
+import com.sparta.nyangdangback.blog.entity.Blog;
+import com.sparta.nyangdangback.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +11,14 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Comment {
+public class Comment extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long blogno;
+    private  Long id;
     private String comment;
 
     @ManyToOne
-    @JoinColumn(name = "blogno")
+    @JoinColumn(name = "blogid")
     private Blog blog;
 
     @ManyToOne

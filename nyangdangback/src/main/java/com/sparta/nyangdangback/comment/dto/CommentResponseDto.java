@@ -4,16 +4,22 @@ import com.sparta.nyangdangback.comment.entity.Comment;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class CommentResponseDto {
-    private Long blogno;
+    private Long id;
     private String comment;
     private String username;
+    private LocalDateTime createAt;
+    private LocalDateTime modifiedAt;
 
     @Builder
-    public CommentRequestDto(Comment comment) {
-        this.blogno = comment.blogno();
-        this.comment = comment.comment();
+    public CommentResponseDto(Comment comment) {
+        this.id = comment.getId();
+        this.comment = comment.getComment();
         this.username = comment.getUser().getUsername();
+        this.createAt = comment.getCreatedAt();
+        this.modifiedAt = comment.getModifiedAt();
     }
 }
